@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="fr" class="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=5">
+<meta name="theme-color" content="#0b1220">
+<title>Météo · Prévisions 7 jours</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+<script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+  *, *::before, *::after { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    min-height: 100dvh;
+    overscroll-behavior-y: none;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  /* ===== GLASS & SKY ===== */
+  .glass {
+    background: rgba(255,255,255,.07);
+    backdrop-filter: blur(18px) saturate(140%);
+    -webkit-backdrop-filter: blur(18px) saturate(140%);
+    border: 1px solid rgba(255,255,255,.12);
+  }
+  .light .glass {
+    background: rgba(255,255,255,.68);
+    border: 1px solid rgba(255,255,255,.95);
+    box-shadow: 0 10px 30px -14px rgba(20,40,80,.28);
+  }
+  .sky {
+    position: fixed; inset: 0; z-index: -2;
+    background:
+      radial-gradient(1200px 700px at 15% 10%, #23407a 0%, transparent 60%),
+      radial-gradient(900px 600px at 85% 20%, #6d3b8e 0%, transparent 55%),
+      linear-gradient(160deg, #0b1220 0%, #101a2f 45%, #0a0f1c 100%);
+  }
+  .light .sky {
+    background:
+      radial-gradient(1100px 700px at 12% 8%, #bfe0ff 0%, transparent 60%),
+      radial-gradient(900px 600px at 88% 15%, #ffd8c2 0%, transparent 55%),
+      linear-gradient(160deg, #eaf3ff 0%, #f6f0ff 50%, #eef6ff 100%);
+  }
+  .blob { position: fixed; border-radius: 9999px; filter: blur(90px); opacity: .35; z-index: -1; animation: float 18s ease-in-out infinite; }
+  @keyframes float { 0%,100%{transform:translate(0,0) scale(1)} 50%{transform:translate(30px,-40px) scale(1.12)} }
+
+  /* ===== ANIMATIONS ===== */
+  .fade-up { animation: fadeUp .45s cubic-bezier(.2,.8,.2,1) both; }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:none} }
+  .spin-slow { animation: spin 26s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg) } }
+
+  /* ===== SCROLLBARS ===== */
+  .scroll-x { -webkit-overflow-scrolling: touch; scrollbar-width: thin; }
+  .scroll-x::-webkit-scrollbar { height: 4px }
+  .scroll-x::-webkit-scrollbar-thumb { background: rgba(255,255,255,.2); border-radius: 99px }
+  .light .scroll-x::-webkit-scrollbar-thumb { background: rgba(0,0,0,.14) }
+  .no-bar::-webkit-scrollbar { display: none }
+  .no-bar { scrollbar-width: none }
+
+  /* ===== UTILS ===== */
+  input { font-size: 16px }
+  input::placeholder { opacity: .55 }
+  .txt-dim { color: #94a3b8 }
+  .light .txt-dim { color: #5b6b82 }
+  .day-row { transition: background .2s ease }
+  .tapable { transition: transform .12s ease }
+  .tapable:active { transform: scale(.985) }
+
+  /* ===== ACCORDÉON 7 JOURS ===== */
+  .detail { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .32s cubic-bezier(.2,.8,.2,1), opacity .25s; opacity: 0 }
+  .detail > div { overflow: hidden }
+  .day-item.open .detail { grid-template-rows: 1fr; opacity: 1 }
+  .day-item.open .chev { transform: rotate(180deg) }
+  .chev { transition: transform .3s ease }
+
+  /* ===== GRILLE PRINCIPALE FLUIDE ===== */
+  /* Mobile : 1 colonne | Tablette : 2 colonnes | Desktop : 2fr 1fr */
+  #main-grid {
+    display: grid;
+    gap: clamp(10px, 2vw, 20px);
+    grid-template-columns: 1fr;
+  }
+  @media (min-width: 640px) {
+    #main-grid { grid-template-columns: 1fr 1fr; }
+  }
+  @media (min-width: 1024px) {
+    #main-grid { grid-template-columns: 2fr 1fr; }
+  }
+  .col-main { grid-column: 1 / -1; }
+  .col-side { grid-column: 1 / -1; }
+  .col-full  { grid-column: 1 / -1; }
+  @media (min-width: 640px) {
+    .col-main { grid-column: 1 / 2; }
+    .col-side { grid-column: 2 / 3; }
+    .col-full  { grid-column: 1 / -1; }
+  }
+
+  /* ===== CARDS STATISTIQUES — grille 2 cols mobile, 4 cols sinon ===== */
+  #stats {
+    display: grid;
+    gap: clamp(6px, 1.5vw, 12px);
+    grid-template-columns: repeat(2, 1fr);
+  }
+  @media (min-width: 480px) {
+    #stats { grid-template-columns: repeat(4, 1fr); }
+  }
+
+  /* ===== CARDS HORAIRES — largeur fluide ===== */
+  .hourly-card {
+    flex-shrink: 0;
+    width: clamp(72px, 18vw, 100px);
+  }
+  @media (min-width: 640px) { .hourly-card { width: clamp(82px, 10vw, 104px); } }
+  @media (min-width: 1024px) { .hourly-card { width: clamp(88px, 7vw, 110px); } }
+
+  /* ===== GRILLE DÉTAILS DÉPLIABLES ===== */
+  .detail-grid {
+    display: grid;
+    gap: 8px;
+    grid-template-columns: repeat(2, 1fr);
+  }
+  @media (min-width: 480px) { .detail-grid { grid-template-columns: repeat(3, 1fr); } }
+  @media (min-width: 1024px) { .detail-grid { grid-template-columns: repeat(6, 1fr); } }
+
+  /* ===== ROW 7 JOURS — colonnes adaptatives ===== */
+  .day-toggle {
+    display: grid;
+    width: 100%;
+    align-items: center;
+    gap: clamp(6px, 1.5vw, 12px);
+    padding: clamp(10px, 2vw, 16px) clamp(10px, 2vw, 20px);
+    min-height: 58px;
+    text-align: left;
+    grid-template-columns: auto 1fr auto auto auto;
+  }
+  /* Sur tablette+, on ajoute la colonne barre min/max */
+  @media (min-width: 640px) {
+    .day-toggle { grid-template-columns: auto 1fr auto minmax(100px, 180px) auto auto; }
+    .bar-col { display: flex !important; }
+  }
+  @media (min-width: 1024px) {
+    .day-toggle { grid-template-columns: auto minmax(160px, 220px) auto minmax(140px, 220px) auto auto; }
+  }
+  .bar-col { display: none; }
+
+  /* Barre min/max mobile : visible < 640px */
+  .bar-mobile { display: block; }
+  @media (min-width: 640px) { .bar-mobile { display: none; } }
+
+  /* ===== TEMPÉRATURE FLUIDE ===== */
+  #curTemp { font-size: clamp(48px, 12vw, 96px); }
+
+  /* ===== ALLÈGEMENT EFFETS MOBILE ===== */
+  @media (max-width: 640px) {
+    .glass { backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px) }
+    .blob { filter: blur(60px); opacity: .28 }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation-duration: .01ms !important; transition-duration: .01ms !important }
+  }
+</style>
+</head>
+<body class="text-slate-100 selection:bg-sky-400/40">
+<div class="sky"></div>
+<div class="blob w-[300px] h-[300px] sm:w-[380px] sm:h-[380px] bg-sky-500/40 top-[-80px] left-[-60px]"></div>
+<div class="blob w-[320px] h-[320px] sm:w-[420px] sm:h-[420px] bg-fuchsia-500/30 bottom-[-120px] right-[-80px]" style="animation-delay:-7s"></div>
+
+<!-- ================= BARRE COLLANTE (header + recherche) ================= -->
+<div class="sticky top-0 z-40 pt-[max(0.75rem,env(safe-area-inset-top))] pb-2 px-3 sm:px-6
+            bg-gradient-to-b from-black/25 via-black/10 to-transparent backdrop-blur-[2px]">
+  <div class="max-w-6xl mx-auto">
+
+    <header class="flex items-center justify-between gap-2 mb-2.5">
+      <div class="flex items-center gap-2.5 min-w-0">
+        <div class="w-9 h-9 sm:w-11 sm:h-11 rounded-2xl glass grid place-items-center bg-gradient-to-br from-sky-400/30 to-indigo-500/30 shrink-0">
+          <i data-lucide="cloud-sun" class="w-5 h-5 sm:w-6 sm:h-6 text-sky-300 inline-block"></i>
+        </div>
+        <div class="min-w-0">
+          <h1 class="text-base sm:text-xl font-extrabold tracking-tight leading-none truncate">Météo<span class="text-sky-400">.</span></h1>
+          <p class="text-[9px] sm:text-[11px] uppercase tracking-[.16em] txt-dim mt-0.5 sm:mt-1">7 jours</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
+        <div class="glass rounded-full p-1 flex text-[11px] sm:text-xs font-semibold">
+          <button data-unit="c" class="unit-btn px-2.5 sm:px-3 py-1.5 rounded-full bg-white/20">°C</button>
+          <button data-unit="f" class="unit-btn px-2.5 sm:px-3 py-1.5 rounded-full opacity-60">°F</button>
+        </div>
+        <button id="refreshBtn" title="Actualiser" class="w-9 h-9 sm:w-10 sm:h-10 glass rounded-full grid place-items-center active:scale-95 transition">
+          <i data-lucide="refresh-cw" class="w-4 h-4 inline-block txt-dim" id="refIcon"></i>
+        </button>
+        <button id="themeBtn" title="Thème" class="w-9 h-9 sm:w-10 sm:h-10 glass rounded-full grid place-items-center active:scale-95 transition">
+          <i data-lucide="moon" class="w-[17px] h-[17px] inline-block" id="themeIcon"></i>
+        </button>
+      </div>
+    </header>
+
+    <div class="relative">
+      <div class="glass rounded-2xl flex items-center gap-2.5 px-3 sm:px-4 py-2.5 sm:py-3">
+        <i data-lucide="search" class="w-[18px] h-[18px] opacity-60 shrink-0 inline-block"></i>
+        <input id="search" autocomplete="off" enterkeyhint="search" type="search" placeholder="Rechercher une ville…"
+          class="flex-1 min-w-0 bg-transparent outline-none font-medium [&::-webkit-search-cancel-button]:hidden">
+        <button id="clearBtn" class="hidden shrink-0 w-7 h-7 rounded-full grid place-items-center bg-white/10 active:scale-90 transition">
+          <i data-lucide="x" class="w-3.5 h-3.5 inline-block"></i>
+        </button>
+        <button id="geoBtn" title="Ma position" aria-label="Ma position"
+          class="shrink-0 h-9 px-2.5 sm:px-3 rounded-xl bg-sky-500 active:bg-sky-600 hover:bg-sky-400 text-white text-xs font-bold flex items-center gap-1.5 transition">
+          <i data-lucide="locate-fixed" class="w-4 h-4 inline-block"></i>
+          <span class="hidden sm:inline">Ma position</span>
+        </button>
+      </div>
+      <div id="suggest" class="hidden absolute top-full mt-2 w-full glass rounded-2xl overflow-hidden shadow-2xl max-h-[55dvh] overflow-y-auto scroll-x"></div>
+    </div>
+  </div>
+</div>
+
+<div class="max-w-6xl mx-auto px-3 sm:px-6 pb-10">
+
+  <!-- Villes récentes -->
+  <div id="recents" class="hidden scroll-x no-bar flex gap-2 overflow-x-auto mt-3 -mx-3 px-3 sm:mx-0 sm:px-0"></div>
+
+  <!-- Erreur -->
+  <div id="err" class="hidden mt-3 rounded-2xl bg-rose-500/15 border border-rose-400/30 text-rose-200 px-4 py-3 text-sm flex items-center gap-2">
+    <i data-lucide="triangle-alert" class="w-4 h-4 shrink-0 inline-block"></i><span id="errTxt"></span>
+  </div>
+
+  <main id="main-grid" class="mt-3 sm:mt-5">
+
+    <!-- ============ MÉTÉO ACTUELLE ============ -->
+    <section class="col-main glass rounded-3xl relative overflow-hidden"
+             style="padding: clamp(14px,3vw,36px);">
+      <div id="curIconBig" class="absolute -right-8 -top-10 opacity-[.09] pointer-events-none select-none"
+           style="width:clamp(120px,20vw,220px);height:clamp(120px,20vw,220px);"></div>
+
+      <div class="relative">
+        <!-- Lieu + date -->
+        <div class="flex items-start justify-between gap-3">
+          <div class="min-w-0">
+            <div class="flex items-center gap-1.5 txt-dim" style="font-size:clamp(11px,1.5vw,14px);">
+              <i data-lucide="map-pin" class="w-3.5 h-3.5 inline-block shrink-0"></i>
+              <span id="place" class="truncate">—</span>
+            </div>
+            <h2 id="cityName" class="font-extrabold tracking-tight mt-1 truncate"
+                style="font-size:clamp(22px,4vw,40px);">Chargement…</h2>
+            <p id="dateNow" class="txt-dim mt-0.5 capitalize"
+               style="font-size:clamp(10px,1.2vw,14px);"></p>
+          </div>
+          <div id="curIconWrap" class="shrink-0"></div>
+        </div>
+
+        <!-- Température -->
+        <div class="flex items-end justify-between gap-3 mt-4">
+          <div class="flex items-start">
+            <span id="curTemp" class="font-extralight tracking-tighter leading-[0.85]">--</span>
+            <span id="curUnit" class="font-light mt-1" style="font-size:clamp(16px,2.5vw,24px);">°C</span>
+          </div>
+          <div class="text-right pb-1 min-w-0" style="max-width:48%;">
+            <p id="curDesc" class="font-semibold truncate" style="font-size:clamp(12px,1.8vw,18px);">—</p>
+            <p class="txt-dim flex items-center gap-1 justify-end flex-wrap"
+               style="font-size:clamp(10px,1.2vw,14px);">
+              <i data-lucide="thermometer" class="w-3.5 h-3.5 inline-block"></i>
+              <span>Ressenti <span id="curFeel">--°</span></span>
+            </p>
+          </div>
+        </div>
+
+        <!-- Min / Max du jour -->
+        <div class="flex items-center gap-2 mt-3">
+          <span class="flex items-center gap-1 font-semibold px-2.5 py-1.5 rounded-full bg-white/8 border border-white/10"
+                style="font-size:clamp(10px,1.2vw,12px);">
+            <i data-lucide="arrow-down" class="w-3 h-3 inline-block text-sky-300"></i><span id="curMin">--°</span>
+          </span>
+          <span class="flex items-center gap-1 font-semibold px-2.5 py-1.5 rounded-full bg-white/8 border border-white/10"
+                style="font-size:clamp(10px,1.2vw,12px);">
+            <i data-lucide="arrow-up" class="w-3 h-3 inline-block text-orange-300"></i><span id="curMax">--°</span>
+          </span>
+          <span id="updated" class="txt-dim ml-auto flex items-center gap-1"
+                style="font-size:clamp(9px,1.1vw,11px);">
+            <i data-lucide="clock" class="w-3 h-3 inline-block"></i><span id="updTxt">—</span>
+          </span>
+        </div>
+
+        <!-- Statistiques -->
+        <div id="stats" class="mt-4"></div>
+      </div>
+    </section>
+
+    <!-- ============ SOLEIL + GRAPHIQUE ============ -->
+    <section class="col-side glass rounded-3xl flex flex-col gap-4"
+             style="padding: clamp(14px,3vw,28px);">
+      <div>
+        <h3 class="uppercase tracking-[.18em] txt-dim mb-3"
+            style="font-size:clamp(9px,1.1vw,12px);">Soleil</h3>
+        <div class="flex items-center justify-between gap-2">
+          <div class="flex items-center gap-2.5">
+            <div class="w-9 h-9 rounded-xl bg-amber-400/20 grid place-items-center shrink-0">
+              <i data-lucide="sunrise" class="w-[18px] h-[18px] text-amber-300 inline-block"></i>
+            </div>
+            <div>
+              <p class="txt-dim" style="font-size:clamp(9px,1.1vw,11px);">Lever</p>
+              <p id="sunrise" class="font-bold tabular-nums" style="font-size:clamp(13px,1.5vw,16px);">--:--</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2.5">
+            <div>
+              <p class="txt-dim text-right" style="font-size:clamp(9px,1.1vw,11px);">Coucher</p>
+              <p id="sunset" class="font-bold text-right tabular-nums" style="font-size:clamp(13px,1.5vw,16px);">--:--</p>
+            </div>
+            <div class="w-9 h-9 rounded-xl bg-indigo-400/20 grid place-items-center shrink-0">
+              <i data-lucide="sunset" class="w-[18px] h-[18px] text-indigo-300 inline-block"></i>
+            </div>
+          </div>
+        </div>
+        <div class="mt-3.5 h-1.5 rounded-full bg-white/10 overflow-hidden">
+          <div id="dayBar" class="h-full bg-gradient-to-r from-amber-300 to-orange-500 w-0 transition-all duration-700"></div>
+        </div>
+        <p id="dayLen" class="txt-dim mt-2" style="font-size:clamp(9px,1.1vw,11px);">—</p>
+      </div>
+
+      <div class="h-px bg-white/10"></div>
+
+      <div class="flex-1">
+        <h3 class="uppercase tracking-[.18em] txt-dim mb-2"
+            style="font-size:clamp(9px,1.1vw,12px);">Températures du jour</h3>
+        <svg id="chart" viewBox="0 0 300 130" preserveAspectRatio="xMidYMid meet"
+             class="w-full overflow-visible" style="height:clamp(100px,15vw,130px);"></svg>
+      </div>
+    </section>
+
+    <!-- ============ HORAIRE ============ -->
+    <section class="col-full glass rounded-3xl" style="padding: clamp(14px,2.5vw,24px);">
+      <div class="flex items-center justify-between mb-3">
+        <h3 class="uppercase tracking-[.18em] txt-dim"
+            style="font-size:clamp(9px,1.1vw,12px);">Prévisions horaires · 24 h</h3>
+        <span class="txt-dim flex items-center gap-1 sm:hidden"
+              style="font-size:clamp(9px,1.1vw,10px);">glisser
+          <i data-lucide="chevrons-right" class="w-3 h-3 inline-block"></i>
+        </span>
+      </div>
+      <div id="hourly" class="scroll-x flex gap-2 overflow-x-auto pb-2 snap-x snap-mandatory -mx-1 px-1"></div>
+    </section>
+
+    <!-- ============ 7 JOURS ============ -->
+    <section class="col-full glass rounded-3xl" style="padding: clamp(12px,2.5vw,24px);">
+      <div class="flex items-center justify-between mb-2">
+        <h3 class="uppercase tracking-[.18em] txt-dim"
+            style="font-size:clamp(9px,1.1vw,12px);">Prévisions sur 7 jours</h3>
+        <span class="txt-dim flex items-center gap-1"
+              style="font-size:clamp(9px,1.1vw,10px);">
+          <i data-lucide="touch" class="w-3 h-3 inline-block"></i> Détails au tap
+        </span>
+      </div>
+      <div id="daily" class="flex flex-col gap-1"></div>
+    </section>
+  </main>
+
+  <footer class="mt-6 sm:mt-8 text-center text-[10px] sm:text-[11px] txt-dim flex items-center justify-center gap-1.5 flex-wrap">
+    <i data-lucide="info" class="w-3.5 h-3.5 inline-block"></i>
+    Données <a class="underline active:opacity-70" href="https://open-meteo.com" target="_blank" rel="noopener">Open-Meteo</a> · Icônes Lucide
+  </footer>
+</div>
+
+<script>
+/* ================= Codes météo ================= */
+const WMO = {
+  0:"Ciel dégagé",1:"Peu nuageux",2:"Partiellement nuageux",3:"Couvert",
+  45:"Brouillard",48:"Brouillard givrant",
+  51:"Bruine légère",53:"Bruine",55:"Bruine dense",56:"Bruine verglaçante",57:"Bruine verglaçante",
+  61:"Pluie faible",63:"Pluie",65:"Forte pluie",66:"Pluie verglaçante",67:"Pluie verglaçante",
+  71:"Neige faible",73:"Neige",75:"Forte neige",77:"Grains de neige",
+  80:"Averses",81:"Averses",82:"Averses violentes",85:"Averses de neige",86:"Averses de neige",
+  95:"Orage",96:"Orage et grêle",99:"Orage violent"
+};
+const desc = c => WMO[c] || "Conditions inconnues";
+
+/* ================= Icône + palette par condition ================= */
+function styleFor(code, isDay){
+  if(code===0) return isDay
+    ? { n:'sun', c:'text-amber-400', g:'from-amber-300/35 to-orange-500/15', ring:'ring-amber-300/25' }
+    : { n:'moon-star', c:'text-indigo-300', g:'from-indigo-400/30 to-slate-600/20', ring:'ring-indigo-300/25' };
+  if(code===1||code===2) return isDay
+    ? { n:'cloud-sun', c:'text-amber-300', g:'from-sky-300/25 to-amber-300/20', ring:'ring-amber-300/20' }
+    : { n:'cloud-moon', c:'text-indigo-200', g:'from-indigo-400/25 to-slate-600/20', ring:'ring-indigo-300/20' };
+  if(code===3) return { n:'cloud', c:'text-slate-300', g:'from-slate-300/25 to-slate-500/15', ring:'ring-white/15' };
+  if(code===45||code===48) return { n:'cloud-fog', c:'text-slate-300', g:'from-slate-300/25 to-sky-200/15', ring:'ring-white/15' };
+  if(code>=51&&code<=55) return { n:'cloud-drizzle', c:'text-sky-300', g:'from-sky-400/30 to-cyan-500/15', ring:'ring-sky-300/25' };
+  if([56,57,66,67].includes(code)) return { n:'cloud-hail', c:'text-cyan-200', g:'from-cyan-300/30 to-indigo-400/15', ring:'ring-cyan-200/25' };
+  if([61,63,80].includes(code)) return { n:'cloud-rain', c:'text-sky-400', g:'from-sky-500/30 to-blue-600/15', ring:'ring-sky-400/25' };
+  if([65,81,82].includes(code)) return { n:'cloud-rain-wind', c:'text-blue-300', g:'from-blue-500/35 to-indigo-600/20', ring:'ring-blue-300/25' };
+  if([71,73,75,77,85,86].includes(code)) return { n:'cloud-snow', c:'text-sky-100', g:'from-sky-200/30 to-indigo-300/15', ring:'ring-sky-100/25' };
+  if(code>=95) return { n:'cloud-lightning', c:'text-violet-300', g:'from-violet-500/35 to-orange-500/15', ring:'ring-violet-300/25' };
+  return { n:'cloud', c:'text-slate-300', g:'from-slate-300/25 to-slate-500/15', ring:'ring-white/15' };
+}
+const ico = (name, cls) => `<i data-lucide="${name}" class="${cls} inline-block"></i>`;
+function wiChip(code, isDay, cls='w-6 h-6', pad='p-2.5', rounded='rounded-2xl'){
+  const s = styleFor(code,isDay);
+  return `<span class="grid place-items-center bg-gradient-to-br ${s.g} ring-1 ${s.ring} ${rounded} ${pad} shrink-0">${ico(s.n, cls+' '+s.c)}</span>`;
+}
+
+/* ================= Rendu des icônes (avec repli) ================= */
+const LUCIDE_ALIAS = { 'cloud-rain-wind':'cloud-rain', 'moon-star':'moon', 'cloud-hail':'cloud-drizzle' };
+function lucideIconExists(n){
+  if(!window.lucide) return false;
+  const I = lucide.icons;
+  if(!I || typeof I !== 'object') return true;
+  const key = n.split('-').map((p,i)=> i ? p[0].toUpperCase()+p.slice(1) : p).join('');
+  return !!(I[n] || I[key]);
+}
+function refreshIcons(){
+  if(window.lucide){
+    document.querySelectorAll('i[data-lucide]').forEach(el=>{
+      const n = el.dataset.lucide;
+      if(!lucideIconExists(n)) el.setAttribute('data-lucide', LUCIDE_ALIAS[n] || (n.includes('moon')?'moon' : n.includes('sun')?'sun' : 'cloud'));
+    });
+    try{ lucide.createIcons(); }catch(e){}
+  }
+  const left = document.querySelectorAll('i[data-lucide]');
+  if(left.length) fallbackIcons(left);
+}
+function fallbackIcons(scope){
+  [...scope].forEach(el=>{
+    const n = el.dataset.lucide;
+    const sunny = /sun|thermometer|gauge/.test(n) && !/cloud/.test(n);
+    const col = sunny ? '#fbbf24' : /moon|sunrise|sunset/.test(n) ? '#a5b4fc' : 'currentColor';
+    el.innerHTML = `<svg viewBox="0 0 64 64" width="100%" height="100%" fill="none" stroke="${col}" stroke-width="3.5" stroke-linecap="round">
+      ${sunny
+        ? `<circle cx="32" cy="32" r="12"/><path d="M32 6v7M32 51v7M6 32h7M51 32h7M13 13l5 5M46 46l5 5M51 13l-5 5M18 46l-5 5"/>`
+        : `<path d="M14 44h30a9 9 0 0 0 1.2-17.9A14 14 0 0 0 18 23.2A9.5 9.5 0 0 0 14 44Z"/>
+           ${/rain|drizzle|hail/.test(n)?'<path d="M22 50l-2 6M32 50l-2 6M42 50l-2 6"/>':''}
+           ${/snow/.test(n)?'<path d="M22 50v6M19 53h6M40 50v6M37 53h6"/>':''}
+           ${/lightning/.test(n)?'<path d="M33 46l-6 9h7l-4 8"/>':''}`}
+    </svg>`;
+    el.classList.add('inline-block');
+  });
+}
+
+/* ================= État ================= */
+let unit = localStorage.getItem('unit') || 'c';
+let current = null;
+const $ = id => document.getElementById(id);
+const cv = t => unit==='c' ? Math.round(t) : Math.round(t*9/5+32);
+const U  = () => unit==='c' ? '°C' : '°F';
+
+/* ================= Thème ================= */
+function setTheme(t){
+  const light = t==='light';
+  document.documentElement.classList.toggle('light', light);
+  document.documentElement.classList.toggle('dark', !light);
+  document.body.classList.toggle('text-slate-100', !light);
+  document.body.classList.toggle('text-slate-800', light);
+  document.querySelector('meta[name=theme-color]').setAttribute('content', light ? '#eaf3ff' : '#0b1220');
+  const i = $('themeIcon');
+  i.setAttribute('data-lucide', light ? 'sun' : 'moon');
+  i.className = 'w-[17px] h-[17px] inline-block ' + (light ? 'text-amber-500' : 'text-indigo-300');
+  localStorage.setItem('theme', t);
+  refreshIcons();
+}
+$('themeBtn').onclick = () => setTheme(localStorage.getItem('theme')==='light' ? 'dark' : 'light');
+setTheme(localStorage.getItem('theme') || 'dark');
+
+/* ================= Unités ================= */
+document.querySelectorAll('.unit-btn').forEach(b=>{
+  b.onclick = () => {
+    unit = b.dataset.unit; localStorage.setItem('unit', unit);
+    document.querySelectorAll('.unit-btn').forEach(x=>{
+      const on = x.dataset.unit===unit;
+      x.classList.toggle('bg-white/20', on); x.classList.toggle('opacity-60', !on);
+    });
+    if(current) render(current.data, current.loc);
+  };
+});
+if(unit==='f') document.querySelector('[data-unit="f"]').click();
+
+/* ================= Villes récentes ================= */
+function getRecents(){ try{ return JSON.parse(localStorage.getItem('recents')||'[]'); }catch(e){ return []; } }
+function addRecent(loc){
+  let r = getRecents().filter(x => !(Math.abs(x.lat-loc.lat)<0.02 && Math.abs(x.lon-loc.lon)<0.02));
+  r.unshift(loc); r = r.slice(0,6);
+  localStorage.setItem('recents', JSON.stringify(r));
+  renderRecents();
+}
+function renderRecents(){
+  const r = getRecents(), box = $('recents');
+  if(!r.length){ box.classList.add('hidden'); return; }
+  box.classList.remove('hidden');
+  box.innerHTML = r.map((x,i)=>`
+    <button data-r="${i}" class="tapable shrink-0 snap-start glass rounded-full pl-3 pr-3.5 py-2 flex items-center gap-1.5 text-xs font-semibold
+      ${current && Math.abs(current.loc.lat-x.lat)<0.02 ? 'ring-1 ring-sky-400/60 bg-sky-500/15' : ''}">
+      ${ico('map-pin','w-3.5 h-3.5 opacity-60')}<span class="max-w-[130px] truncate">${x.name}</span>
+    </button>`).join('');
+  box.querySelectorAll('button[data-r]').forEach(b=>{
+    b.onclick = () => { const x = getRecents()[b.dataset.r]; searchEl.value = x.name; toggleClear(); load(x.lat,x.lon,x.name,x.sub); };
+  });
+  refreshIcons();
+}
+
+/* ================= Recherche ================= */
+const searchEl = $('search'), sugEl = $('suggest');
+let tmr, activeIdx = -1, results = [];
+const toggleClear = () => $('clearBtn').classList.toggle('hidden', !searchEl.value);
+
+searchEl.addEventListener('input', ()=>{
+  toggleClear();
+  clearTimeout(tmr);
+  const q = searchEl.value.trim();
+  if(q.length < 2){ hideSug(); return; }
+  tmr = setTimeout(()=>geocode(q), 280);
+});
+$('clearBtn').onclick = () => { searchEl.value=''; toggleClear(); hideSug(); searchEl.focus(); };
+searchEl.addEventListener('keydown', e=>{
+  const items = [...sugEl.querySelectorAll('button')];
+  if(e.key==='Enter'){ e.preventDefault(); searchEl.blur(); if(items.length) (items[activeIdx]||items[0]).click(); return; }
+  if(!items.length) return;
+  if(e.key==='ArrowDown'){ e.preventDefault(); activeIdx=(activeIdx+1)%items.length; hi(items); }
+  else if(e.key==='ArrowUp'){ e.preventDefault(); activeIdx=(activeIdx-1+items.length)%items.length; hi(items); }
+  else if(e.key==='Escape'){ hideSug(); searchEl.blur(); }
+});
+function hi(items){ items.forEach((b,i)=>{ b.classList.toggle('bg-white/15', i===activeIdx); if(i===activeIdx) b.scrollIntoView({block:'nearest'}); }); }
+function hideSug(){ sugEl.classList.add('hidden'); sugEl.innerHTML=''; activeIdx=-1; }
+document.addEventListener('click', e=>{ if(!sugEl.contains(e.target) && e.target!==searchEl) hideSug(); });
+
+async function geocode(q){
+  try{
+    const r = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(q)}&count=6&language=fr&format=json`);
+    const j = await r.json();
+    results = j.results || [];
+    if(!results.length){
+      sugEl.innerHTML = `<div class="px-4 py-4 text-sm txt-dim flex items-center gap-2">${ico('search-x','w-4 h-4')} Aucun résultat pour « ${q} »</div>`;
+      sugEl.classList.remove('hidden'); refreshIcons(); return;
+    }
+    sugEl.innerHTML = results.map((r,i)=>`
+      <button data-i="${i}" class="w-full text-left px-4 py-3.5 min-h-[56px] active:bg-white/20 hover:bg-white/15 transition flex items-center justify-between gap-3 border-b border-white/5 last:border-0">
+        <span class="flex items-center gap-3 min-w-0">
+          ${ico('map-pin','w-4 h-4 opacity-60 shrink-0')}
+          <span class="min-w-0">
+            <span class="block font-semibold truncate text-[15px]">${r.name}</span>
+            <span class="block text-xs txt-dim truncate">${[r.admin1,r.country].filter(Boolean).join(', ')}</span>
+          </span>
+        </span>
+        ${ico('chevron-right','w-4 h-4 opacity-40 shrink-0')}
+      </button>`).join('');
+    sugEl.classList.remove('hidden'); activeIdx = -1; refreshIcons();
+    sugEl.querySelectorAll('button[data-i]').forEach(b=>{
+      b.onclick = ()=>{
+        const r = results[b.dataset.i];
+        searchEl.value = r.name; toggleClear(); hideSug(); searchEl.blur();
+        load(r.latitude, r.longitude, r.name, [r.admin1,r.country].filter(Boolean).join(', '));
+      };
+    });
+  }catch(e){ showErr("Impossible de contacter le service de recherche."); }
+}
+
+/* ================= Géolocalisation ================= */
+$('geoBtn').onclick = ()=>{
+  if(!navigator.geolocation) return showErr("Géolocalisation non supportée par ce navigateur.");
+  $('geoBtn').classList.add('animate-pulse');
+  navigator.geolocation.getCurrentPosition(p=>{
+    $('geoBtn').classList.remove('animate-pulse');
+    const {latitude:la, longitude:lo} = p.coords;
+    load(la, lo, 'Ma position', `${la.toFixed(2)}, ${lo.toFixed(2)}`);
+  }, ()=>{ $('geoBtn').classList.remove('animate-pulse'); showErr("Accès à la position refusé."); }, {timeout:10000, enableHighAccuracy:true});
+};
+
+/* ================= Actualiser ================= */
+$('refreshBtn').onclick = ()=>{
+  if(!current) return;
+  $('refIcon').classList.add('animate-spin');
+  const l = current.loc;
+  load(l.lat, l.lon, l.name, l.sub).finally(()=> setTimeout(()=>$('refIcon').classList.remove('animate-spin'), 500));
+};
+
+/* ================= Erreurs ================= */
+function showErr(m){
+  $('errTxt').textContent = m; $('err').classList.remove('hidden'); refreshIcons();
+  clearTimeout(showErr.t); showErr.t = setTimeout(()=>$('err').classList.add('hidden'), 5000);
+}
+
+/* ================= Chargement ================= */
+async function load(lat, lon, name, sub){
+  $('cityName').textContent = 'Chargement…';
+  const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}`
+    +`&current=temperature_2m,relative_humidity_2m,apparent_temperature,is_day,precipitation,weather_code,wind_speed_10m,surface_pressure`
+    +`&hourly=temperature_2m,weather_code,precipitation_probability,is_day`
+    +`&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,uv_index_max,precipitation_probability_max,precipitation_sum,wind_speed_10m_max`
+    +`&timezone=auto&forecast_days=7`;
+  try{
+    const r = await fetch(url);
+    if(!r.ok) throw 0;
+    const data = await r.json();
+    const loc = {name, sub, lat, lon};
+    current = {data, loc};
+    localStorage.setItem('lastLoc', JSON.stringify(loc));
+    addRecent(loc);
+    render(data, loc);
+  }catch(e){
+    showErr("Échec du chargement des données météo. Vérifiez votre connexion.");
+    $('cityName').textContent = name;
+  }
+}
+
+/* ================= Carte statistique ================= */
+function statCard(label, val, unitTxt, iconName, color, ring, grad){
+  return `<div class="rounded-2xl bg-white/5 border border-white/10" style="padding:clamp(10px,2vw,14px);">
+    <div class="flex items-center gap-2 mb-2">
+      <span class="rounded-lg bg-gradient-to-br ${grad} ring-1 ${ring} grid place-items-center shrink-0"
+            style="width:clamp(26px,3.5vw,32px);height:clamp(26px,3.5vw,32px);">
+        ${ico(iconName,'w-3.5 h-3.5 '+color)}
+      </span>
+      <p class="uppercase tracking-wider txt-dim truncate leading-tight"
+         style="font-size:clamp(8px,1vw,11px);">${label}</p>
+    </div>
+    <p class="font-bold tabular-nums" style="font-size:clamp(16px,2.5vw,22px);">
+      ${val}<span class="font-medium txt-dim" style="font-size:clamp(9px,1vw,12px); margin-left:3px;">${unitTxt}</span>
+    </p>
+  </div>`;
+}
+
+/* ================= Rendu ================= */
+function render(d, loc){
+  const c = d.current, day = d.daily, isDay = c.is_day===1;
+
+  $('cityName').textContent = loc.name;
+  $('place').textContent = loc.sub || '—';
+  $('curTemp').textContent = cv(c.temperature_2m);
+  $('curUnit').textContent = U();
+  $('curFeel').textContent = cv(c.apparent_temperature)+'°';
+  $('curDesc').textContent = desc(c.weather_code);
+  $('curMin').textContent = cv(day.temperature_2m_min[0])+'°';
+  $('curMax').textContent = cv(day.temperature_2m_max[0])+'°';
+  $('updTxt').textContent = new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+
+  $('curIconWrap').innerHTML = wiChip(c.weather_code, isDay, 'w-9 h-9 sm:w-14 sm:h-14', 'p-2.5 sm:p-4', 'rounded-2xl sm:rounded-3xl');
+  const s = styleFor(c.weather_code, isDay);
+  $('curIconBig').innerHTML = `<div class="w-full h-full grid place-items-center ${c.weather_code===0?'spin-slow':''}">${ico(s.n,'w-full h-full '+s.c)}</div>`;
+
+  const now = new Date();
+  $('dateNow').textContent = now.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});
+
+  $('stats').innerHTML = [
+    statCard('Vent', Math.round(c.wind_speed_10m), 'km/h', 'wind', 'text-sky-300', 'ring-sky-300/20', 'from-sky-400/30 to-blue-500/15'),
+    statCard('Humidité', Math.round(c.relative_humidity_2m), '%', 'droplets', 'text-cyan-300', 'ring-cyan-300/20', 'from-cyan-300/30 to-sky-500/15'),
+    statCard('Indice UV', Math.round(day.uv_index_max[0] ?? 0), 'max', 'sun', 'text-amber-300', 'ring-amber-300/20', 'from-amber-300/30 to-orange-500/15'),
+    statCard('Pluie', (day.precipitation_probability_max[0] ?? 0), '%', 'umbrella', 'text-indigo-300', 'ring-indigo-300/20', 'from-indigo-400/30 to-violet-500/15')
+  ].join('');
+
+  /* Soleil */
+  const sr = new Date(day.sunrise[0]), ss = new Date(day.sunset[0]);
+  const hm = dt => dt.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+  $('sunrise').textContent = hm(sr); $('sunset').textContent = hm(ss);
+  const len = (ss-sr)/3600000;
+  $('dayLen').textContent = `Durée du jour · ${Math.floor(len)} h ${Math.round((len%1)*60)} min`;
+  const nowLocal = new Date(new Date().toLocaleString('en-US',{timeZone:d.timezone}));
+  $('dayBar').style.width = (Math.max(0, Math.min(1,(nowLocal-sr)/(ss-sr)))*100)+'%';
+
+  /* Horaire */
+  const times = d.hourly.time;
+  let start = times.findIndex(t => new Date(t) >= new Date(d.current.time));
+  if(start < 0) start = 0;
+  const slice = [];
+  for(let i=start; i<start+24 && i<times.length; i++) slice.push(i);
+
+  $('hourly').innerHTML = slice.map((i,k)=>{
+    const t = new Date(times[i]);
+    const pp = d.hourly.precipitation_probability[i] ?? 0;
+    const isNow = k===0;
+    return `<div class="hourly-card snap-start rounded-2xl border text-center fade-up
+        ${isNow ? 'bg-sky-500/20 border-sky-400/40' : 'bg-white/5 border-white/10'}"
+        style="padding:clamp(8px,1.5vw,14px); animation-delay:${Math.min(k,12)*20}ms">
+      <p class="txt-dim font-semibold" style="font-size:clamp(9px,1.2vw,11px);"
+        >${isNow?'Maint.':String(t.getHours()).padStart(2,'0')+'h'}</p>
+      <div class="flex justify-center" style="margin:clamp(6px,1vw,10px) 0;">
+        ${wiChip(d.hourly.weather_code[i], d.hourly.is_day[i]===1, 'w-5 h-5', 'p-1.5', 'rounded-xl')}
+      </div>
+      <p class="font-bold tabular-nums" style="font-size:clamp(12px,1.5vw,14px);">${cv(d.hourly.temperature_2m[i])}°</p>
+      <p class="flex items-center justify-center gap-0.5 mt-0.5 ${pp>30?'text-sky-300':'txt-dim'}"
+         style="font-size:clamp(8px,1vw,10px);">
+        ${ico('droplet','w-2.5 h-2.5')}${pp}%
+      </p>
+    </div>`;
+  }).join('');
+
+  drawChart(slice.map(i=>d.hourly.temperature_2m[i]), slice.map(i=>new Date(times[i]).getHours()));
+
+  /* 7 jours */
+  const gmin = Math.min(...day.temperature_2m_min), gmax = Math.max(...day.temperature_2m_max);
+  const span = Math.max(1, gmax-gmin);
+  $('daily').innerHTML = day.time.map((t,i)=>{
+    const dt = new Date(t);
+    const full = dt.toLocaleDateString('fr-FR',{weekday:'long'});
+    const short = dt.toLocaleDateString('fr-FR',{weekday:'short'}).replace('.','');
+    const label = i===0 ? "Aujourd'hui" : full;
+    const labelS = i===0 ? "Auj." : short;
+    const dateS = dt.toLocaleDateString('fr-FR',{day:'numeric',month:'short'});
+    const l = ((day.temperature_2m_min[i]-gmin)/span)*100;
+    const w = ((day.temperature_2m_max[i]-day.temperature_2m_min[i])/span)*100;
+    const pp = day.precipitation_probability_max[i] ?? 0;
+    const mm = (day.precipitation_sum?.[i] ?? 0).toFixed(1);
+    const uv = Math.round(day.uv_index_max[i] ?? 0);
+    const wd = Math.round(day.wind_speed_10m_max[i]);
+    const sunR = new Date(day.sunrise[i]).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+    const sunS = new Date(day.sunset[i]).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+
+    return `<div class="day-item rounded-2xl overflow-hidden ${i===0?'bg-white/10':'bg-white/[0.03] hover:bg-white/[0.07]'} fade-up" style="animation-delay:${i*45}ms">
+
+      <button class="day-toggle tapable day-row">
+        <!-- Icône -->
+        <span>${wiChip(day.weather_code[i], true, 'w-5 h-5', 'p-1.5', 'rounded-xl')}</span>
+
+        <!-- Nom + date -->
+        <span class="min-w-0">
+          <span class="block font-semibold capitalize truncate"
+                style="font-size:clamp(12px,1.5vw,14px);">${i===0?"Aujourd'hui":full}</span>
+          <span class="block txt-dim truncate"
+                style="font-size:clamp(9px,1.1vw,11px);">${dateS} · ${desc(day.weather_code[i])}</span>
+        </span>
+
+        <!-- Pluie -->
+        <span class="flex items-center gap-0.5 tabular-nums ${pp>30?'text-sky-300':'txt-dim'}"
+              style="font-size:clamp(9px,1.1vw,11px);">
+          ${ico('droplet','w-3 h-3')}${pp}%
+        </span>
+
+        <!-- Barre min/max (tablette+) -->
+        <span class="bar-col items-center gap-2">
+          <span class="txt-dim text-right tabular-nums"
+                style="font-size:clamp(10px,1.2vw,12px); min-width:32px;">${cv(day.temperature_2m_min[i])}°</span>
+          <span class="flex-1 h-1.5 rounded-full bg-white/10 relative overflow-hidden">
+            <span class="absolute h-full rounded-full bg-gradient-to-r from-sky-400 via-amber-300 to-orange-500"
+                  style="left:${l}%;width:${Math.max(w,4)}%"></span>
+          </span>
+          <span class="font-bold tabular-nums"
+                style="font-size:clamp(10px,1.2vw,12px); min-width:32px;">${cv(day.temperature_2m_max[i])}°</span>
+        </span>
+
+        <!-- Temp max/min -->
+        <span class="text-right tabular-nums whitespace-nowrap"
+              style="font-size:clamp(12px,1.5vw,14px);">
+          <span class="font-bold">${cv(day.temperature_2m_max[i])}°</span>
+          <span class="txt-dim">/${cv(day.temperature_2m_min[i])}°</span>
+        </span>
+
+        <!-- Chevron -->
+        ${ico('chevron-down','chev w-4 h-4 opacity-40')}
+      </button>
+
+      <!-- Barre min/max (mobile uniquement) -->
+      <div class="bar-mobile" style="padding: 0 clamp(10px,2vw,20px) 10px; margin-top:-4px;">
+        <div class="flex items-center gap-2">
+          <span class="txt-dim tabular-nums"
+                style="font-size:10px; min-width:26px; text-align:right;">${cv(day.temperature_2m_min[i])}°</span>
+          <span class="flex-1 h-1.5 rounded-full bg-white/10 relative overflow-hidden">
+            <span class="absolute h-full rounded-full bg-gradient-to-r from-sky-400 via-amber-300 to-orange-500"
+                  style="left:${l}%;width:${Math.max(w,5)}%"></span>
+          </span>
+          <span class="txt-dim tabular-nums"
+                style="font-size:10px; min-width:26px;">${cv(day.temperature_2m_max[i])}°</span>
+        </div>
+      </div>
+
+      <!-- Détails dépliables -->
+      <div class="detail"><div>
+        <div style="padding: 0 clamp(10px,2vw,20px) clamp(10px,2vw,16px);">
+          <div class="detail-grid">
+            ${detailCell('wind','Vent max', wd+' km/h','text-sky-300')}
+            ${detailCell('umbrella','Précip.', mm+' mm','text-indigo-300')}
+            ${detailCell('sun','UV max', uv,'text-amber-300')}
+            ${detailCell('droplet','Risque pluie', pp+' %','text-cyan-300')}
+            ${detailCell('sunrise','Lever', sunR,'text-amber-300')}
+            ${detailCell('sunset','Coucher', sunS,'text-indigo-300')}
+          </div>
+        </div>
+      </div></div>
+    </div>`;
+  }).join('');
+
+  renderRecents();
+  refreshIcons();
+}
+function detailCell(icon, label, val, color){
+  return `<div class="rounded-xl bg-white/5 border border-white/10" style="padding: clamp(8px,1.5vw,12px);">
+    <p class="uppercase tracking-wider txt-dim flex items-center gap-1"
+       style="font-size:clamp(8px,1vw,10px);">${ico(icon,'w-3 h-3 '+color)}${label}</p>
+    <p class="font-bold tabular-nums mt-1"
+       style="font-size:clamp(12px,1.5vw,14px);">${val}</p>
+  </div>`;
+}
+
+/* Accordéon 7 jours */
+$('daily').addEventListener('click', e=>{
+  const btn = e.target.closest('.day-toggle');
+  if(!btn) return;
+  const item = btn.closest('.day-item');
+  const open = item.classList.contains('open');
+  $('daily').querySelectorAll('.day-item.open').forEach(x=>x.classList.remove('open'));
+  if(!open) item.classList.add('open');
+});
+
+/* ================= Graphique ================= */
+function drawChart(temps, hours){
+  const svg = $('chart'); if(!temps || !temps.length) return;
+  const W=300,H=130,pad=16;
+  const mn=Math.min(...temps), mx=Math.max(...temps), rg=Math.max(1,mx-mn);
+  const X=i=> pad + i*(W-pad*2)/(temps.length-1);
+  const Y=v=> H-30 - ((v-mn)/rg)*(H-62);
+  let path='';
+  temps.forEach((v,i)=>{ path += (i?' L':'M')+X(i).toFixed(1)+','+Y(v).toFixed(1); });
+  const area = path + ` L${X(temps.length-1).toFixed(1)},${H-18} L${X(0).toFixed(1)},${H-18} Z`;
+  const marks=[0,6,12,18,23].filter(i=>i<temps.length);
+  svg.innerHTML = `
+  <defs>
+    <linearGradient id="g1" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#38bdf8" stop-opacity=".45"/><stop offset="100%" stop-color="#38bdf8" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="g2" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#38bdf8"/><stop offset="60%" stop-color="#a78bfa"/><stop offset="100%" stop-color="#fb923c"/>
+    </linearGradient>
+  </defs>
+  <path d="${area}" fill="url(#g1)"/>
+  <path d="${path}" fill="none" stroke="url(#g2)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
+  ${marks.map(i=>`<circle cx="${X(i).toFixed(1)}" cy="${Y(temps[i]).toFixed(1)}" r="2.6" fill="currentColor"/>
+    <text x="${X(i).toFixed(1)}" y="${(Y(temps[i])-9).toFixed(1)}" text-anchor="middle" font-size="10" font-weight="700" fill="currentColor">${cv(temps[i])}°</text>
+    <text x="${X(i).toFixed(1)}" y="${H-4}" text-anchor="middle" font-size="9" fill="currentColor" opacity=".5">${String(hours[i]).padStart(2,'0')}h</text>`).join('')}`;
+}
+
+/* ================= Démarrage ================= */
+(function init(){
+  renderRecents();
+  const last = JSON.parse(localStorage.getItem('lastLoc') || 'null');
+  if(last){ searchEl.value = last.name; toggleClear(); load(last.lat,last.lon,last.name,last.sub); }
+  else load(48.8566, 2.3522, 'Paris', 'Île-de-France, France');
+  refreshIcons();
+})();
+</script>
+</body>
+</html>
