@@ -203,10 +203,10 @@
             }
         }
 
-        /* ===== STATISTIQUES — mobile 2 cols, tablette+ 4 cols ===== */
+        /* ===== STATISTIQUES ===== */
         #stats {
             display: grid;
-            gap: clamp(6px, 1.5vw, 12px);
+            gap: clamp(4px, 1.5vw, 12px);
             grid-template-columns: repeat(2, 1fr);
         }
         @media (min-width: 480px) {
@@ -214,37 +214,72 @@
                 grid-template-columns: repeat(4, 1fr);
             }
         }
+        #stats>div {
+            padding: clamp(6px, 2vw, 14px) !important;
+            border-radius: 14px !important;
+        }
+        #stats>div .flex {
+            gap: 4px !important;
+        }
+        #stats>div .flex span {
+            width: clamp(22px, 3.5vw, 32px) !important;
+            height: clamp(22px, 3.5vw, 32px) !important;
+        }
+        #stats>div .flex span i {
+            width: clamp(11px, 1.8vw, 18px) !important;
+            height: clamp(11px, 1.8vw, 18px) !important;
+        }
+        #stats>div .label {
+            font-size: clamp(6.5px, 1vw, 11px) !important;
+        }
+        #stats>div p:last-child {
+            font-size: clamp(13px, 2.5vw, 22px) !important;
+        }
+        #stats>div p:last-child span {
+            font-size: clamp(7px, 1vw, 12px) !important;
+        }
 
         /* ===== CARTES HORAIRES ===== */
         .hourly-card {
             flex-shrink: 0;
-            width: clamp(68px, 20vw, 100px);
+            width: clamp(60px, 20vw, 100px);
+            padding: clamp(4px, 1.5vw, 14px) !important;
         }
         @media (min-width: 480px) {
             .hourly-card {
-                width: clamp(76px, 16vw, 100px);
+                width: clamp(68px, 16vw, 100px);
             }
         }
         @media (min-width: 640px) {
             .hourly-card {
-                width: clamp(82px, 10vw, 104px);
+                width: clamp(76px, 10vw, 104px);
             }
         }
         @media (min-width: 1024px) {
             .hourly-card {
-                width: clamp(88px, 7vw, 110px);
+                width: clamp(82px, 7vw, 110px);
             }
+        }
+        .hourly-card p:first-child {
+            font-size: clamp(7px, 1.2vw, 11px);
+        }
+        .hourly-card .temp {
+            font-size: clamp(10px, 1.5vw, 14px);
+        }
+        .hourly-card .precip {
+            font-size: clamp(6px, 1vw, 10px);
         }
 
         /* ===== GRILLE DÉTAILS DÉPLIABLES ===== */
         .detail-grid {
             display: grid;
-            gap: 8px;
+            gap: 6px;
             grid-template-columns: repeat(2, 1fr);
         }
         @media (min-width: 480px) {
             .detail-grid {
                 grid-template-columns: repeat(3, 1fr);
+                gap: 8px;
             }
         }
         @media (min-width: 1024px) {
@@ -252,25 +287,33 @@
                 grid-template-columns: repeat(6, 1fr);
             }
         }
+        .detail-grid>div {
+            padding: clamp(4px, 1.5vw, 12px) !important;
+        }
+        .detail-grid>div p:first-child {
+            font-size: clamp(6px, 1vw, 10px) !important;
+        }
+        .detail-grid>div p:last-child {
+            font-size: clamp(10px, 1.5vw, 14px) !important;
+        }
 
-        /* ===== ROW 7 JOURS — version mobile optimisée ===== */
+        /* ===== ROW 7 JOURS ===== */
         .day-toggle {
             display: grid;
             width: 100%;
             align-items: center;
-            gap: clamp(4px, 1.2vw, 12px);
-            padding: clamp(8px, 2vw, 16px) clamp(8px, 2vw, 20px);
-            min-height: 56px;
+            gap: clamp(2px, 1.2vw, 12px);
+            padding: clamp(4px, 2vw, 16px) clamp(4px, 2vw, 20px);
+            min-height: 44px;
             text-align: left;
-            /* mobile : 4 colonnes */
             grid-template-columns: auto 1fr auto auto;
             cursor: pointer;
             touch-action: manipulation;
         }
-        /* tablette+ : 6 colonnes avec barre min/max */
         @media (min-width: 640px) {
             .day-toggle {
-                grid-template-columns: auto 1fr auto minmax(100px, 180px) auto auto;
+                grid-template-columns: auto 1fr auto minmax(80px, 180px) auto auto;
+                min-height: 52px;
             }
             .bar-col {
                 display: flex !important;
@@ -278,16 +321,17 @@
         }
         @media (min-width: 1024px) {
             .day-toggle {
-                grid-template-columns: auto minmax(140px, 220px) auto minmax(140px, 220px) auto auto;
+                grid-template-columns: auto minmax(120px, 220px) auto minmax(120px, 220px) auto auto;
             }
         }
         .bar-col {
             display: none;
         }
 
-        /* Barre min/max mobile uniquement */
         .bar-mobile {
             display: block;
+            padding: 0 clamp(4px, 2vw, 20px) 4px !important;
+            margin-top: -2px;
         }
         @media (min-width: 640px) {
             .bar-mobile {
@@ -295,36 +339,97 @@
             }
         }
 
-        /* ===== PRÉCIPITATIONS — badge mobile ===== */
+        .day-toggle .name-wrap .day-label {
+            font-size: clamp(10px, 1.5vw, 14px);
+        }
+        .day-toggle .name-wrap .date {
+            font-size: clamp(7px, 1.1vw, 11px);
+        }
+        .day-toggle .temp-wrap {
+            font-size: clamp(11px, 1.5vw, 14px);
+        }
         .precip-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 2px;
-            font-size: clamp(9px, 1.1vw, 11px);
-            padding: 2px 8px 2px 6px;
-            border-radius: 99px;
-            background: rgba(255, 255, 255, .06);
-            border: 1px solid rgba(255, 255, 255, .06);
-            white-space: nowrap;
+            font-size: clamp(7px, 1vw, 11px) !important;
+            padding: 1px 6px 1px 4px !important;
         }
-        .light .precip-badge {
-            background: rgba(0, 0, 0, .04);
-            border-color: rgba(0, 0, 0, .06);
+        .precip-badge i {
+            width: 12px !important;
+            height: 12px !important;
         }
-        .precip-badge.high {
-            color: #7dd3fc;
-            border-color: rgba(125, 211, 252, .25);
-            background: rgba(125, 211, 252, .10);
+
+        /* ===== RECHERCHE ===== */
+        .search-wrap input {
+            min-height: 38px;
+            font-size: 14px;
         }
-        .light .precip-badge.high {
-            color: #0b8bc4;
-            border-color: rgba(11, 139, 196, .20);
-            background: rgba(11, 139, 196, .08);
+        .search-wrap button {
+            min-height: 34px;
+            min-width: 34px;
+        }
+        #geoBtn {
+            min-height: 38px;
+            min-width: 38px;
+        }
+        #suggest button {
+            min-height: 44px;
+            padding: 6px 12px !important;
+        }
+        #suggest button .sug-name {
+            font-size: 13px !important;
+        }
+        #suggest button .sug-sub {
+            font-size: 10px !important;
+        }
+
+        /* ===== BOUTON UNITÉ ===== */
+        .unit-btn {
+            min-height: 28px;
+            min-width: 28px;
+            font-size: 10px;
+            padding: 0 8px;
+        }
+        @media (min-width: 640px) {
+            .unit-btn {
+                font-size: 12px;
+                padding: 0 12px;
+                min-height: 32px;
+            }
         }
 
         /* ===== TEMPÉRATURE ===== */
         #curTemp {
-            font-size: clamp(48px, 12vw, 96px);
+            font-size: clamp(38px, 12vw, 96px);
+        }
+        #curUnit {
+            font-size: clamp(12px, 2.5vw, 24px);
+        }
+
+        /* ===== HEADER ===== */
+        header .w-8 {
+            width: 32px;
+            height: 32px;
+        }
+        header h1 {
+            font-size: 14px;
+        }
+        @media (min-width: 640px) {
+            header .w-8 {
+                width: 44px;
+                height: 44px;
+            }
+            header h1 {
+                font-size: 20px;
+            }
+        }
+
+        /* ===== GRAPHIQUE ===== */
+        #chart text {
+            font-size: 8px !important;
+        }
+        @media (min-width: 640px) {
+            #chart text {
+                font-size: 10px !important;
+            }
         }
 
         /* ===== ALLÈGEMENT EFFETS MOBILE ===== */
@@ -339,134 +444,151 @@
             }
             /* touches plus grandes */
             .day-toggle {
-                min-height: 52px;
-            }
-            .day-toggle .precip-badge {
-                padding: 1px 6px 1px 4px;
-            }
-            .day-toggle .precip-badge i {
-                width: 12px;
-                height: 12px;
+                min-height: 44px;
             }
             /* stats plus compactes */
             #stats>div {
-                padding: 8px 10px !important;
+                padding: 6px 8px !important;
             }
             #stats>div .flex {
-                gap: 4px !important;
+                gap: 2px !important;
             }
             #stats>div .flex span {
-                width: 26px !important;
-                height: 26px !important;
+                width: 20px !important;
+                height: 20px !important;
             }
             #stats>div .flex span i {
-                width: 13px !important;
-                height: 13px !important;
-            }
-            #stats>div p:last-child {
-                font-size: 15px !important;
-            }
-        }
-        @media (max-width: 400px) {
-            .day-toggle {
-                grid-template-columns: auto 1fr auto auto;
-                gap: 4px;
-                padding: 6px 8px;
-                min-height: 48px;
-            }
-            .day-toggle .name-wrap .date {
-                font-size: 9px !important;
-            }
-            .day-toggle .name-wrap .day-label {
-                font-size: 11px !important;
-            }
-            .day-toggle .temp-wrap {
-                font-size: 13px !important;
-            }
-            .hourly-card {
-                width: clamp(60px, 22vw, 76px);
-                padding: 6px 4px !important;
-            }
-            .hourly-card p:first-child {
-                font-size: 8px !important;
-            }
-            .hourly-card .temp {
-                font-size: 11px !important;
-            }
-            .hourly-card .precip {
-                font-size: 7px !important;
-            }
-            #stats {
-                gap: 4px;
-            }
-            #stats>div {
-                padding: 6px 8px !important;
-                border-radius: 12px !important;
-            }
-            #stats>div .flex span {
-                width: 22px !important;
-                height: 22px !important;
-            }
-            #stats>div .flex span i {
-                width: 11px !important;
-                height: 11px !important;
+                width: 10px !important;
+                height: 10px !important;
             }
             #stats>div .label {
-                font-size: 7px !important;
+                font-size: 6.5px !important;
             }
             #stats>div p:last-child {
                 font-size: 13px !important;
             }
             #stats>div p:last-child span {
-                font-size: 8px !important;
+                font-size: 7px !important;
             }
-        }
-
-        /* ===== RECHERCHE ===== */
-        .search-wrap {
-            position: relative;
-        }
-        .search-wrap input {
-            min-height: 44px;
-        }
-        .search-wrap button {
-            min-height: 36px;
-            min-width: 36px;
-        }
-        #geoBtn {
-            min-height: 44px;
-            min-width: 44px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        /* ===== SUGGESTIONS ===== */
-        #suggest button {
-            min-height: 52px;
-            touch-action: manipulation;
-        }
-        @media (max-width: 400px) {
-            #suggest button {
-                min-height: 44px;
-                padding: 8px 12px !important;
+            /* détails */
+            .detail-grid {
+                gap: 4px;
             }
-            #suggest button .sug-name {
-                font-size: 13px !important;
+            .detail-grid>div {
+                padding: 4px 6px !important;
+                border-radius: 10px !important;
             }
-            #suggest button .sug-sub {
+            .detail-grid>div p:first-child {
+                font-size: 6px !important;
+            }
+            .detail-grid>div p:last-child {
                 font-size: 10px !important;
             }
+            .detail-grid>div p:first-child i {
+                width: 10px !important;
+                height: 10px !important;
+            }
         }
-
-        /* ===== BOUTON UNITÉ ===== */
-        .unit-btn {
-            touch-action: manipulation;
-            min-height: 32px;
-            min-width: 32px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        @media (max-width: 400px) {
+            .day-toggle {
+                grid-template-columns: auto 1fr auto auto;
+                gap: 2px;
+                padding: 4px 6px;
+                min-height: 38px;
+            }
+            .day-toggle .name-wrap .day-label {
+                font-size: 9px !important;
+            }
+            .day-toggle .name-wrap .date {
+                font-size: 6px !important;
+            }
+            .day-toggle .temp-wrap {
+                font-size: 10px !important;
+            }
+            .hourly-card {
+                width: 52px !important;
+                padding: 4px 2px !important;
+            }
+            .hourly-card p:first-child {
+                font-size: 6px !important;
+            }
+            .hourly-card .temp {
+                font-size: 9px !important;
+            }
+            .hourly-card .precip {
+                font-size: 5px !important;
+            }
+            #stats {
+                gap: 2px;
+            }
+            #stats>div {
+                padding: 4px 4px !important;
+                border-radius: 8px !important;
+            }
+            #stats>div .flex span {
+                width: 16px !important;
+                height: 16px !important;
+            }
+            #stats>div .flex span i {
+                width: 8px !important;
+                height: 8px !important;
+            }
+            #stats>div .label {
+                font-size: 5px !important;
+            }
+            #stats>div p:last-child {
+                font-size: 10px !important;
+            }
+            #stats>div p:last-child span {
+                font-size: 5px !important;
+            }
+            .detail-grid {
+                gap: 2px;
+            }
+            .detail-grid>div {
+                padding: 2px 4px !important;
+            }
+            .detail-grid>div p:first-child {
+                font-size: 5px !important;
+            }
+            .detail-grid>div p:last-child {
+                font-size: 8px !important;
+            }
+            .bar-mobile {
+                padding: 0 4px 2px !important;
+            }
+            .bar-mobile span {
+                font-size: 7px !important;
+                min-width: 18px !important;
+            }
+            .bar-mobile .h-1\.5 {
+                height: 3px !important;
+            }
+            #curTemp {
+                font-size: 32px !important;
+            }
+            #curUnit {
+                font-size: 10px !important;
+            }
+            .search-wrap input {
+                font-size: 12px;
+                min-height: 32px;
+            }
+            #geoBtn {
+                min-height: 32px;
+                min-width: 32px;
+                font-size: 10px;
+            }
+            #geoBtn span {
+                display: none;
+            }
+            header .w-8 {
+                width: 28px;
+                height: 28px;
+            }
+            header h1 {
+                font-size: 12px;
+            }
         }
 
         /* ===== RÉDUCTION MOUVEMENT ===== */
@@ -485,13 +607,13 @@
     <div class="blob w-[320px] h-[320px] sm:w-[420px] sm:h-[420px] bg-fuchsia-500/30 bottom-[-120px] right-[-80px]" style="animation-delay:-7s"></div>
 
     <!-- ===== BARRE COLLANTE ===== -->
-    <div class="sticky top-0 z-40 pt-[max(0.5rem,env(safe-area-inset-top))] pb-2 px-3 sm:px-6
+    <div class="sticky top-0 z-40 pt-[max(0.4rem,env(safe-area-inset-top))] pb-2 px-2 sm:px-6
                 bg-gradient-to-b from-black/25 via-black/10 to-transparent backdrop-blur-[2px]">
         <div class="max-w-6xl mx-auto">
 
             <!-- HEADER -->
-            <header class="flex items-center justify-between gap-2 mb-2">
-                <div class="flex items-center gap-2 min-w-0">
+            <header class="flex items-center justify-between gap-1 mb-1.5">
+                <div class="flex items-center gap-1.5 min-w-0">
                     <div class="w-8 h-8 sm:w-11 sm:h-11 rounded-2xl glass grid place-items-center bg-gradient-to-br from-sky-400/30 to-indigo-500/30 shrink-0">
                         <i data-lucide="cloud-sun" class="w-4 h-4 sm:w-6 sm:h-6 text-sky-300 inline-block"></i>
                     </div>
@@ -502,8 +624,8 @@
                 </div>
                 <div class="flex items-center gap-1 sm:gap-2 shrink-0">
                     <div class="glass rounded-full p-0.5 flex text-[10px] sm:text-xs font-semibold">
-                        <button data-unit="c" class="unit-btn px-2 sm:px-3 py-1 sm:py-1.5 rounded-full bg-white/20 touch-manipulation">°C</button>
-                        <button data-unit="f" class="unit-btn px-2 sm:px-3 py-1 sm:py-1.5 rounded-full opacity-60 touch-manipulation">°F</button>
+                        <button data-unit="c" class="unit-btn rounded-full bg-white/20 touch-manipulation">°C</button>
+                        <button data-unit="f" class="unit-btn rounded-full opacity-60 touch-manipulation">°F</button>
                     </div>
                     <button id="refreshBtn" title="Actualiser" class="w-8 h-8 sm:w-10 sm:h-10 glass rounded-full grid place-items-center active:scale-95 transition touch-manipulation">
                         <i data-lucide="refresh-cw" class="w-3.5 h-3.5 sm:w-4 sm:h-4 inline-block txt-dim" id="refIcon"></i>
@@ -516,16 +638,16 @@
 
             <!-- RECHERCHE -->
             <div class="search-wrap relative">
-                <div class="glass rounded-2xl flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-3">
-                    <i data-lucide="search" class="w-[16px] h-[16px] sm:w-[18px] sm:h-[18px] opacity-60 shrink-0 inline-block"></i>
+                <div class="glass rounded-2xl flex items-center gap-1.5 px-2 sm:px-4 py-1.5 sm:py-3">
+                    <i data-lucide="search" class="w-[14px] h-[14px] sm:w-[18px] sm:h-[18px] opacity-60 shrink-0 inline-block"></i>
                     <input id="search" autocomplete="off" enterkeyhint="search" type="search" placeholder="Rechercher une ville…"
                     class="flex-1 min-w-0 bg-transparent outline-none font-medium text-sm sm:text-base [&::-webkit-search-cancel-button]:hidden" />
-                    <button id="clearBtn" class="hidden shrink-0 w-7 h-7 rounded-full grid place-items-center bg-white/10 active:scale-90 transition touch-manipulation">
-                        <i data-lucide="x" class="w-3.5 h-3.5 inline-block"></i>
+                    <button id="clearBtn" class="hidden shrink-0 w-6 h-6 rounded-full grid place-items-center bg-white/10 active:scale-90 transition touch-manipulation">
+                        <i data-lucide="x" class="w-3 h-3 inline-block"></i>
                     </button>
                     <button id="geoBtn" title="Ma position" aria-label="Ma position"
-                    class="shrink-0 h-9 sm:h-10 px-2 sm:px-3 rounded-xl bg-sky-500 active:bg-sky-600 hover:bg-sky-400 text-white text-xs font-bold flex items-center gap-1.5 transition touch-manipulation">
-                    <i data-lucide="locate-fixed" class="w-4 h-4 inline-block"></i>
+                    class="shrink-0 h-8 sm:h-10 px-1.5 sm:px-3 rounded-xl bg-sky-500 active:bg-sky-600 hover:bg-sky-400 text-white text-[10px] sm:text-xs font-bold flex items-center gap-1 transition touch-manipulation">
+                    <i data-lucide="locate-fixed" class="w-3.5 h-3.5 sm:w-4 sm:h-4 inline-block"></i>
                     <span class="hidden sm:inline">Ma position</span>
                 </button>
             </div>
@@ -535,141 +657,141 @@
 </div>
 
 <!-- ===== CONTENU PRINCIPAL ===== -->
-<div class="max-w-6xl mx-auto px-3 sm:px-6 pb-10">
+<div class="max-w-6xl mx-auto px-2 sm:px-6 pb-8">
 
     <!-- Villes récentes -->
-    <div id="recents" class="hidden scroll-x no-bar flex gap-2 overflow-x-auto mt-3 -mx-3 px-3 sm:mx-0 sm:px-0"></div>
+    <div id="recents" class="hidden scroll-x no-bar flex gap-2 overflow-x-auto mt-2 -mx-2 px-2 sm:mx-0 sm:px-0"></div>
 
     <!-- Erreur -->
-    <div id="err" class="hidden mt-3 rounded-2xl bg-rose-500/15 border border-rose-400/30 text-rose-200 px-4 py-3 text-sm flex items-center gap-2">
+    <div id="err" class="hidden mt-2 rounded-2xl bg-rose-500/15 border border-rose-400/30 text-rose-200 px-3 py-2 text-xs sm:text-sm flex items-center gap-2">
         <i data-lucide="triangle-alert" class="w-4 h-4 shrink-0 inline-block"></i>
         <span id="errTxt"></span>
     </div>
 
     <!-- ===== GRILLE PRINCIPALE ===== -->
-    <main id="main-grid" class="mt-3 sm:mt-5">
+    <main id="main-grid" class="mt-2 sm:mt-5">
 
         <!-- ============ MÉTÉO ACTUELLE ============ -->
-        <section class="col-main glass rounded-3xl relative overflow-hidden" style="padding: clamp(12px, 3.5vw, 36px);">
+        <section class="col-main glass rounded-3xl relative overflow-hidden" style="padding: clamp(10px, 3.5vw, 36px);">
             <div id="curIconBig" class="absolute -right-8 -top-10 opacity-[.09] pointer-events-none select-none"
-            style="width:clamp(100px, 20vw, 220px); height:clamp(100px, 20vw, 220px);"></div>
+            style="width:clamp(80px, 20vw, 220px); height:clamp(80px, 20vw, 220px);"></div>
 
             <div class="relative">
                 <!-- Lieu + date -->
-                <div class="flex items-start justify-between gap-3">
+                <div class="flex items-start justify-between gap-2">
                     <div class="min-w-0">
-                        <div class="flex items-center gap-1.5 txt-dim" style="font-size:clamp(10px, 1.5vw, 14px);">
-                            <i data-lucide="map-pin" class="w-3.5 h-3.5 inline-block shrink-0"></i>
+                        <div class="flex items-center gap-1 txt-dim" style="font-size:clamp(9px, 1.5vw, 14px);">
+                            <i data-lucide="map-pin" class="w-3 h-3 inline-block shrink-0"></i>
                             <span id="place" class="truncate">—</span>
                         </div>
-                        <h2 id="cityName" class="font-extrabold tracking-tight mt-1 truncate" style="font-size:clamp(20px, 4vw, 40px);">Chargement…</h2>
-                        <p id="dateNow" class="txt-dim mt-0.5 capitalize" style="font-size:clamp(9px, 1.2vw, 14px);"></p>
+                        <h2 id="cityName" class="font-extrabold tracking-tight mt-0.5 truncate" style="font-size:clamp(18px, 4vw, 40px);">Chargement…</h2>
+                        <p id="dateNow" class="txt-dim mt-0.5 capitalize" style="font-size:clamp(8px, 1.2vw, 14px);"></p>
                     </div>
                     <div id="curIconWrap" class="shrink-0"></div>
                 </div>
 
                 <!-- Température -->
-                <div class="flex items-end justify-between gap-3 mt-3 sm:mt-4">
+                <div class="flex items-end justify-between gap-2 mt-2 sm:mt-4">
                     <div class="flex items-start">
                         <span id="curTemp" class="font-extralight tracking-tighter leading-[0.85]">--</span>
-                        <span id="curUnit" class="font-light mt-1" style="font-size:clamp(14px, 2.5vw, 24px);">°C</span>
+                        <span id="curUnit" class="font-light mt-1" style="font-size:clamp(12px, 2.5vw, 24px);">°C</span>
                     </div>
                     <div class="text-right pb-1 min-w-0" style="max-width:48%;">
-                        <p id="curDesc" class="font-semibold truncate" style="font-size:clamp(11px, 1.8vw, 18px);">—</p>
-                        <p class="txt-dim flex items-center gap-1 justify-end flex-wrap" style="font-size:clamp(9px, 1.2vw, 14px);">
-                            <i data-lucide="thermometer" class="w-3.5 h-3.5 inline-block"></i>
+                        <p id="curDesc" class="font-semibold truncate" style="font-size:clamp(10px, 1.8vw, 18px);">—</p>
+                        <p class="txt-dim flex items-center gap-1 justify-end flex-wrap" style="font-size:clamp(8px, 1.2vw, 14px);">
+                            <i data-lucide="thermometer" class="w-3 h-3 inline-block"></i>
                             <span>Ressenti <span id="curFeel">--°</span></span>
                         </p>
                     </div>
                 </div>
 
                 <!-- Min / Max du jour -->
-                <div class="flex items-center gap-2 mt-3 flex-wrap">
-                    <span class="flex items-center gap-1 font-semibold px-2.5 py-1.5 rounded-full bg-white/8 border border-white/10" style="font-size:clamp(9px, 1.2vw, 12px);">
-                        <i data-lucide="arrow-down" class="w-3 h-3 inline-block text-sky-300"></i>
+                <div class="flex items-center gap-1.5 mt-2 flex-wrap">
+                    <span class="flex items-center gap-1 font-semibold px-2 py-1 rounded-full bg-white/8 border border-white/10" style="font-size:clamp(8px, 1.2vw, 12px);">
+                        <i data-lucide="arrow-down" class="w-2.5 h-2.5 inline-block text-sky-300"></i>
                         <span id="curMin">--°</span>
                     </span>
-                    <span class="flex items-center gap-1 font-semibold px-2.5 py-1.5 rounded-full bg-white/8 border border-white/10" style="font-size:clamp(9px, 1.2vw, 12px);">
-                        <i data-lucide="arrow-up" class="w-3 h-3 inline-block text-orange-300"></i>
+                    <span class="flex items-center gap-1 font-semibold px-2 py-1 rounded-full bg-white/8 border border-white/10" style="font-size:clamp(8px, 1.2vw, 12px);">
+                        <i data-lucide="arrow-up" class="w-2.5 h-2.5 inline-block text-orange-300"></i>
                         <span id="curMax">--°</span>
                     </span>
-                    <span id="updated" class="txt-dim ml-auto flex items-center gap-1" style="font-size:clamp(8px, 1.1vw, 11px);">
-                        <i data-lucide="clock" class="w-3 h-3 inline-block"></i>
+                    <span id="updated" class="txt-dim ml-auto flex items-center gap-1" style="font-size:clamp(7px, 1.1vw, 11px);">
+                        <i data-lucide="clock" class="w-2.5 h-2.5 inline-block"></i>
                         <span id="updTxt">—</span>
                     </span>
                 </div>
 
                 <!-- Statistiques -->
-                <div id="stats" class="mt-4"></div>
+                <div id="stats" class="mt-3"></div>
             </div>
         </section>
 
         <!-- ============ SOLEIL + GRAPHIQUE ============ -->
-        <section class="col-side glass rounded-3xl flex flex-col gap-4" style="padding: clamp(12px, 3.5vw, 28px);">
+        <section class="col-side glass rounded-3xl flex flex-col gap-3" style="padding: clamp(10px, 3.5vw, 28px);">
             <div>
-                <h3 class="uppercase tracking-[.18em] txt-dim mb-3" style="font-size:clamp(8px, 1.1vw, 12px);">Soleil</h3>
+                <h3 class="uppercase tracking-[.18em] txt-dim mb-2" style="font-size:clamp(7px, 1.1vw, 12px);">Soleil</h3>
                 <div class="flex items-center justify-between gap-2">
-                    <div class="flex items-center gap-2.5">
-                        <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-amber-400/20 grid place-items-center shrink-0">
-                            <i data-lucide="sunrise" class="w-[16px] h-[16px] sm:w-[18px] sm:h-[18px] text-amber-300 inline-block"></i>
+                    <div class="flex items-center gap-2">
+                        <div class="w-7 h-7 sm:w-9 sm:h-9 rounded-xl bg-amber-400/20 grid place-items-center shrink-0">
+                            <i data-lucide="sunrise" class="w-[14px] h-[14px] sm:w-[18px] sm:h-[18px] text-amber-300 inline-block"></i>
                         </div>
                         <div>
-                            <p class="txt-dim" style="font-size:clamp(8px, 1.1vw, 11px);">Lever</p>
-                            <p id="sunrise" class="font-bold tabular-nums" style="font-size:clamp(12px, 1.5vw, 16px);">--:--</p>
+                            <p class="txt-dim" style="font-size:clamp(7px, 1.1vw, 11px);">Lever</p>
+                            <p id="sunrise" class="font-bold tabular-nums" style="font-size:clamp(11px, 1.5vw, 16px);">--:--</p>
                         </div>
                     </div>
-                    <div class="flex items-center gap-2.5">
+                    <div class="flex items-center gap-2">
                         <div>
-                            <p class="txt-dim text-right" style="font-size:clamp(8px, 1.1vw, 11px);">Coucher</p>
-                            <p id="sunset" class="font-bold text-right tabular-nums" style="font-size:clamp(12px, 1.5vw, 16px);">--:--</p>
+                            <p class="txt-dim text-right" style="font-size:clamp(7px, 1.1vw, 11px);">Coucher</p>
+                            <p id="sunset" class="font-bold text-right tabular-nums" style="font-size:clamp(11px, 1.5vw, 16px);">--:--</p>
                         </div>
-                        <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-indigo-400/20 grid place-items-center shrink-0">
-                            <i data-lucide="sunset" class="w-[16px] h-[16px] sm:w-[18px] sm:h-[18px] text-indigo-300 inline-block"></i>
+                        <div class="w-7 h-7 sm:w-9 sm:h-9 rounded-xl bg-indigo-400/20 grid place-items-center shrink-0">
+                            <i data-lucide="sunset" class="w-[14px] h-[14px] sm:w-[18px] sm:h-[18px] text-indigo-300 inline-block"></i>
                         </div>
                     </div>
                 </div>
-                <div class="mt-3.5 h-1.5 rounded-full bg-white/10 overflow-hidden">
+                <div class="mt-3 h-1.5 rounded-full bg-white/10 overflow-hidden">
                     <div id="dayBar" class="h-full bg-gradient-to-r from-amber-300 to-orange-500 w-0 transition-all duration-700"></div>
                 </div>
-                <p id="dayLen" class="txt-dim mt-2" style="font-size:clamp(8px, 1.1vw, 11px);">—</p>
+                <p id="dayLen" class="txt-dim mt-1.5" style="font-size:clamp(7px, 1.1vw, 11px);">—</p>
             </div>
 
             <div class="h-px bg-white/10"></div>
 
             <div class="flex-1">
-                <h3 class="uppercase tracking-[.18em] txt-dim mb-2" style="font-size:clamp(8px, 1.1vw, 12px);">Températures du jour</h3>
+                <h3 class="uppercase tracking-[.18em] txt-dim mb-1.5" style="font-size:clamp(7px, 1.1vw, 12px);">Températures du jour</h3>
                 <svg id="chart" viewBox="0 0 300 130" preserveAspectRatio="xMidYMid meet"
-                class="w-full overflow-visible" style="height:clamp(90px, 15vw, 130px);"></svg>
+                class="w-full overflow-visible" style="height:clamp(80px, 15vw, 130px);"></svg>
             </div>
         </section>
 
         <!-- ============ HORAIRE ============ -->
-        <section class="col-full glass rounded-3xl" style="padding: clamp(10px, 2.5vw, 24px);">
-            <div class="flex items-center justify-between mb-3">
-                <h3 class="uppercase tracking-[.18em] txt-dim" style="font-size:clamp(8px, 1.1vw, 12px);">Prévisions horaires · 24 h</h3>
-                <span class="txt-dim flex items-center gap-1 sm:hidden" style="font-size:clamp(8px, 1.1vw, 10px);">
+        <section class="col-full glass rounded-3xl" style="padding: clamp(8px, 2.5vw, 24px);">
+            <div class="flex items-center justify-between mb-2">
+                <h3 class="uppercase tracking-[.18em] txt-dim" style="font-size:clamp(7px, 1.1vw, 12px);">Prévisions horaires · 24 h</h3>
+                <span class="txt-dim flex items-center gap-1 sm:hidden" style="font-size:clamp(7px, 1.1vw, 10px);">
                     glisser
-                    <i data-lucide="chevrons-right" class="w-3 h-3 inline-block"></i>
+                    <i data-lucide="chevrons-right" class="w-2.5 h-2.5 inline-block"></i>
                 </span>
             </div>
-            <div id="hourly" class="scroll-x flex gap-2 overflow-x-auto pb-2 snap-x snap-mandatory -mx-1 px-1"></div>
+            <div id="hourly" class="scroll-x flex gap-1.5 overflow-x-auto pb-1 snap-x snap-mandatory -mx-1 px-1"></div>
         </section>
 
         <!-- ============ 7 JOURS ============ -->
-        <section class="col-full glass rounded-3xl" style="padding: clamp(10px, 2.5vw, 24px);">
-            <div class="flex items-center justify-between mb-2">
-                <h3 class="uppercase tracking-[.18em] txt-dim" style="font-size:clamp(8px, 1.1vw, 12px);">Prévisions sur 7 jours</h3>
-                <span class="txt-dim flex items-center gap-1" style="font-size:clamp(8px, 1.1vw, 10px);">
-                    <i data-lucide="touch" class="w-3 h-3 inline-block"></i>
+        <section class="col-full glass rounded-3xl" style="padding: clamp(8px, 2.5vw, 24px);">
+            <div class="flex items-center justify-between mb-1.5">
+                <h3 class="uppercase tracking-[.18em] txt-dim" style="font-size:clamp(7px, 1.1vw, 12px);">Prévisions sur 7 jours</h3>
+                <span class="txt-dim flex items-center gap-1" style="font-size:clamp(7px, 1.1vw, 10px);">
+                    <i data-lucide="touch" class="w-2.5 h-2.5 inline-block"></i>
                     Détails au tap
                 </span>
             </div>
-            <div id="daily" class="flex flex-col gap-1"></div>
+            <div id="daily" class="flex flex-col gap-0.5"></div>
         </section>
     </main>
 
-    <footer class="mt-6 sm:mt-8 text-center text-[10px] sm:text-[11px] txt-dim flex items-center justify-center gap-1.5 flex-wrap">
-        <i data-lucide="info" class="w-3.5 h-3.5 inline-block"></i>
+    <footer class="mt-4 sm:mt-8 text-center text-[9px] sm:text-[11px] txt-dim flex items-center justify-center gap-1.5 flex-wrap">
+        <i data-lucide="info" class="w-3 h-3 inline-block"></i>
         Données <a class="underline active:opacity-70" href="https://open-meteo.com" target="_blank" rel="noopener">Open-Meteo</a> · Icônes Lucide
     </footer>
 </div>
@@ -736,7 +858,7 @@
     }
     const ico = (name, cls) => `<i data-lucide="${name}" class="${cls} inline-block"></i>`;
 
-    function wiChip(code, isDay, cls = 'w-5 h-5 sm:w-6 sm:h-6', pad = 'p-1.5 sm:p-2.5', rounded = 'rounded-xl sm:rounded-2xl') {
+    function wiChip(code, isDay, cls = 'w-4 h-4 sm:w-6 sm:h-6', pad = 'p-1 sm:p-2.5', rounded = 'rounded-lg sm:rounded-2xl') {
         const s = styleFor(code, isDay);
         return `<span class="grid place-items-center bg-gradient-to-br ${s.g} ring-1 ${s.ring} ${rounded} ${pad} shrink-0">${ico(s.n, cls+' '+s.c)}</span>`;
     }
@@ -839,9 +961,9 @@
         if (!r.length) { box.classList.add('hidden'); return; }
         box.classList.remove('hidden');
         box.innerHTML = r.map((x, i) => `
-        <button data-r="${i}" class="tapable shrink-0 snap-start glass rounded-full pl-3 pr-3.5 py-2 flex items-center gap-1.5 text-xs font-semibold
+        <button data-r="${i}" class="tapable shrink-0 snap-start glass rounded-full pl-2.5 pr-3 py-1.5 flex items-center gap-1 text-[10px] sm:text-xs font-semibold
           ${current && Math.abs(current.loc.lat-x.lat)<0.02 ? 'ring-1 ring-sky-400/60 bg-sky-500/15' : ''}">
-          ${ico('map-pin','w-3.5 h-3.5 opacity-60')}<span class="max-w-[130px] truncate">${x.name}</span>
+          ${ico('map-pin','w-3 h-3 opacity-60')}<span class="max-w-[100px] sm:max-w-[130px] truncate">${x.name}</span>
         </button>`).join('');
         box.querySelectorAll('button[data-r]').forEach(b => {
             b.onclick = () => { const x = getRecents()[b.dataset.r];
@@ -900,21 +1022,21 @@
             results = j.results || [];
             if (!results.length) {
                 sugEl.innerHTML =
-                    `<div class="px-4 py-4 text-sm txt-dim flex items-center gap-2">${ico('search-x','w-4 h-4')} Aucun résultat pour « ${q} »</div>`;
+                    `<div class="px-3 py-3 text-xs txt-dim flex items-center gap-2">${ico('search-x','w-3.5 h-3.5')} Aucun résultat pour « ${q} »</div>`;
                 sugEl.classList.remove('hidden');
                 refreshIcons();
                 return;
             }
             sugEl.innerHTML = results.map((r, i) => `
-          <button data-i="${i}" class="w-full text-left px-4 py-3.5 min-h-[52px] sm:min-h-[56px] active:bg-white/20 hover:bg-white/15 transition flex items-center justify-between gap-3 border-b border-white/5 last:border-0">
-            <span class="flex items-center gap-3 min-w-0">
-              ${ico('map-pin','w-4 h-4 opacity-60 shrink-0')}
+          <button data-i="${i}" class="w-full text-left px-3 py-2.5 min-h-[44px] sm:min-h-[56px] active:bg-white/20 hover:bg-white/15 transition flex items-center justify-between gap-2 border-b border-white/5 last:border-0">
+            <span class="flex items-center gap-2 min-w-0">
+              ${ico('map-pin','w-3.5 h-3.5 opacity-60 shrink-0')}
               <span class="min-w-0">
-                <span class="sug-name block font-semibold truncate text-sm sm:text-[15px]">${r.name}</span>
-                <span class="sug-sub block text-xs txt-dim truncate">${[r.admin1,r.country].filter(Boolean).join(', ')}</span>
+                <span class="sug-name block font-semibold truncate text-xs sm:text-[15px]">${r.name}</span>
+                <span class="sug-sub block text-[10px] sm:text-xs txt-dim truncate">${[r.admin1,r.country].filter(Boolean).join(', ')}</span>
               </span>
             </span>
-            ${ico('chevron-right','w-4 h-4 opacity-40 shrink-0')}
+            ${ico('chevron-right','w-3.5 h-3.5 opacity-40 shrink-0')}
           </button>`).join('');
             sugEl.classList.remove('hidden');
             activeIdx = -1;
@@ -987,17 +1109,16 @@
 
     /* ================= Carte statistique ================= */
     function statCard(label, val, unitTxt, iconName, color, ring, grad) {
-        return `<div class="rounded-2xl bg-white/5 border border-white/10" style="padding:clamp(8px, 2.5vw, 14px);">
-        <div class="flex items-center gap-2 mb-1.5 sm:mb-2">
+        return `<div class="rounded-2xl bg-white/5 border border-white/10">
+        <div class="flex items-center gap-1.5 mb-1">
           <span class="rounded-lg bg-gradient-to-br ${grad} ring-1 ${ring} grid place-items-center shrink-0"
-                style="width:clamp(24px, 3.5vw, 32px);height:clamp(24px, 3.5vw, 32px);">
-            ${ico(iconName,'w-3 h-3 sm:w-3.5 sm:h-3.5 '+color)}
+                style="width:clamp(20px, 3.5vw, 32px);height:clamp(20px, 3.5vw, 32px);">
+            ${ico(iconName,'w-2.5 h-2.5 sm:w-3.5 sm:h-3.5 '+color)}
           </span>
-          <p class="label uppercase tracking-wider txt-dim truncate leading-tight"
-             style="font-size:clamp(7px, 1vw, 11px);">${label}</p>
+          <p class="label uppercase tracking-wider txt-dim truncate leading-tight">${label}</p>
         </div>
-        <p class="font-bold tabular-nums" style="font-size:clamp(14px, 2.5vw, 22px);">
-          ${val}<span class="font-medium txt-dim" style="font-size:clamp(8px, 1vw, 12px); margin-left:3px;">${unitTxt}</span>
+        <p class="font-bold tabular-nums">
+          ${val}<span class="font-medium txt-dim" style="margin-left:2px;">${unitTxt}</span>
         </p>
       </div>`;
     }
@@ -1018,7 +1139,7 @@
         $('curMax').textContent = cv(day.temperature_2m_max[0]) + '°';
         $('updTxt').textContent = new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
 
-        $('curIconWrap').innerHTML = wiChip(c.weather_code, isDay, 'w-7 h-7 sm:w-14 sm:h-14', 'p-1.5 sm:p-4',
+        $('curIconWrap').innerHTML = wiChip(c.weather_code, isDay, 'w-6 h-6 sm:w-14 sm:h-14', 'p-1.5 sm:p-4',
             'rounded-xl sm:rounded-3xl');
         const s = styleFor(c.weather_code, isDay);
         $('curIconBig').innerHTML =
@@ -1062,15 +1183,13 @@
             const isNow = k === 0;
             return `<div class="hourly-card snap-start rounded-2xl border text-center fade-up
             ${isNow ? 'bg-sky-500/20 border-sky-400/40' : 'bg-white/5 border-white/10'}"
-            style="padding:clamp(6px, 1.5vw, 14px); animation-delay:${Math.min(k,12)*20}ms">
-          <p class="txt-dim font-semibold" style="font-size:clamp(8px, 1.2vw, 11px);"
-            >${isNow?'Maint.':String(t.getHours()).padStart(2,'0')+'h'}</p>
-          <div class="flex justify-center" style="margin:clamp(4px, 1vw, 10px) 0;">
-            ${wiChip(d.hourly.weather_code[i], d.hourly.is_day[i]===1, 'w-4 h-4 sm:w-5 sm:h-5', 'p-1', 'rounded-lg sm:rounded-xl')}
+            style="animation-delay:${Math.min(k,12)*20}ms">
+          <p class="txt-dim font-semibold">${isNow?'Maint.':String(t.getHours()).padStart(2,'0')+'h'}</p>
+          <div class="flex justify-center" style="margin:clamp(2px, 1vw, 10px) 0;">
+            ${wiChip(d.hourly.weather_code[i], d.hourly.is_day[i]===1, 'w-3.5 h-3.5 sm:w-5 sm:h-5', 'p-0.5 sm:p-1.5', 'rounded-md sm:rounded-xl')}
           </div>
-          <p class="temp font-bold tabular-nums" style="font-size:clamp(11px, 1.5vw, 14px);">${cv(d.hourly.temperature_2m[i])}°</p>
-          <p class="precip flex items-center justify-center gap-0.5 mt-0.5 ${pp>30?'text-sky-300':'txt-dim'}"
-             style="font-size:clamp(7px, 1vw, 10px);">
+          <p class="temp font-bold tabular-nums">${cv(d.hourly.temperature_2m[i])}°</p>
+          <p class="precip flex items-center justify-center gap-0.5 mt-0.5 ${pp>30?'text-sky-300':'txt-dim'}">
             ${ico('droplet','w-2 h-2 sm:w-2.5 sm:h-2.5')}${pp}%
           </p>
         </div>`;
@@ -1085,9 +1204,6 @@
         $('daily').innerHTML = day.time.map((t, i) => {
             const dt = new Date(t);
             const full = dt.toLocaleDateString('fr-FR', { weekday: 'long' });
-            const short = dt.toLocaleDateString('fr-FR', { weekday: 'short' }).replace('.', '');
-            const label = i === 0 ? "Aujourd'hui" : full;
-            const labelS = i === 0 ? "Auj." : short;
             const dateS = dt.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
             const l = ((day.temperature_2m_min[i] - gmin) / span) * 100;
             const w = ((day.temperature_2m_max[i] - day.temperature_2m_min[i]) / span) * 100;
@@ -1097,65 +1213,65 @@
             const wd = Math.round(day.wind_speed_10m_max[i]);
             const sunR = new Date(day.sunrise[i]).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
             const sunS = new Date(day.sunset[i]).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
-            const precipLabel = pp > 30 ? ` <span class="precip-badge high">${ico('droplet','w-3 h-3')}${pp}%</span>` :
-                ` <span class="precip-badge">${ico('droplet','w-3 h-3')}${pp}%</span>`;
+            const precipLabel = pp > 30 ? ` <span class="precip-badge high">${ico('droplet','w-2.5 h-2.5')}${pp}%</span>` :
+                ` <span class="precip-badge">${ico('droplet','w-2.5 h-2.5')}${pp}%</span>`;
 
             return `<div class="day-item rounded-2xl overflow-hidden ${i===0?'bg-white/10':'bg-white/[0.03] hover:bg-white/[0.07]'} fade-up" style="animation-delay:${i*45}ms">
 
           <button class="day-toggle tapable day-row">
             <!-- Icône -->
-            <span>${wiChip(day.weather_code[i], true, 'w-4 h-4 sm:w-5 sm:h-5', 'p-1 sm:p-1.5', 'rounded-lg sm:rounded-xl')}</span>
+            <span>${wiChip(day.weather_code[i], true, 'w-3.5 h-3.5 sm:w-5 sm:h-5', 'p-0.5 sm:p-1.5', 'rounded-md sm:rounded-xl')}</span>
 
             <!-- Nom + date + précipitations (mobile) -->
-            <span class="name-wrap min-w-0 flex flex-wrap items-center gap-1">
-              <span class="day-label font-semibold capitalize truncate" style="font-size:clamp(11px, 1.5vw, 14px);">${i===0?"Aujourd'hui":full}</span>
-              <span class="date txt-dim truncate" style="font-size:clamp(8px, 1.1vw, 11px);">${dateS}</span>
+            <span class="name-wrap min-w-0 flex flex-wrap items-center gap-0.5">
+              <span class="day-label font-semibold capitalize truncate">${i===0?"Aujourd'hui":full}</span>
+              <span class="date txt-dim truncate">${dateS}</span>
               <span class="sm:hidden">${precipLabel}</span>
             </span>
 
             <!-- Précipitations (tablette+) -->
             <span class="hidden sm:flex items-center gap-0.5 tabular-nums ${pp>30?'text-sky-300':'txt-dim'}"
-                  style="font-size:clamp(9px, 1.1vw, 11px);">
-              ${ico('droplet','w-3 h-3')}${pp}%
+                  style="font-size:clamp(8px, 1.1vw, 11px);">
+              ${ico('droplet','w-2.5 h-2.5')}${pp}%
             </span>
 
             <!-- Barre min/max (tablette+) -->
-            <span class="bar-col items-center gap-2">
+            <span class="bar-col items-center gap-1.5">
               <span class="txt-dim text-right tabular-nums"
-                    style="font-size:clamp(9px, 1.2vw, 12px); min-width:28px;">${cv(day.temperature_2m_min[i])}°</span>
-              <span class="flex-1 h-1.5 rounded-full bg-white/10 relative overflow-hidden">
+                    style="font-size:clamp(8px, 1.2vw, 12px); min-width:24px;">${cv(day.temperature_2m_min[i])}°</span>
+              <span class="flex-1 h-1 rounded-full bg-white/10 relative overflow-hidden">
                 <span class="absolute h-full rounded-full bg-gradient-to-r from-sky-400 via-amber-300 to-orange-500"
                       style="left:${l}%;width:${Math.max(w,4)}%"></span>
               </span>
               <span class="font-bold tabular-nums"
-                    style="font-size:clamp(9px, 1.2vw, 12px); min-width:28px;">${cv(day.temperature_2m_max[i])}°</span>
+                    style="font-size:clamp(8px, 1.2vw, 12px); min-width:24px;">${cv(day.temperature_2m_max[i])}°</span>
             </span>
 
             <!-- Temp max/min -->
-            <span class="temp-wrap text-right tabular-nums whitespace-nowrap" style="font-size:clamp(12px, 1.5vw, 14px);">
+            <span class="temp-wrap text-right tabular-nums whitespace-nowrap">
               <span class="font-bold">${cv(day.temperature_2m_max[i])}°</span>
               <span class="txt-dim text-[0.8em]">/${cv(day.temperature_2m_min[i])}°</span>
             </span>
 
             <!-- Chevron -->
-            ${ico('chevron-down','chev w-3.5 h-3.5 sm:w-4 sm:h-4 opacity-40')}
+            ${ico('chevron-down','chev w-3 h-3 sm:w-4 sm:h-4 opacity-40')}
           </button>
 
           <!-- Barre min/max (mobile uniquement) -->
-          <div class="bar-mobile" style="padding: 0 clamp(8px, 2vw, 20px) 8px; margin-top:-4px;">
-            <div class="flex items-center gap-2">
-              <span class="txt-dim tabular-nums" style="font-size:9px; min-width:24px; text-align:right;">${cv(day.temperature_2m_min[i])}°</span>
-              <span class="flex-1 h-1.5 rounded-full bg-white/10 relative overflow-hidden">
+          <div class="bar-mobile">
+            <div class="flex items-center gap-1.5">
+              <span class="txt-dim tabular-nums" style="font-size:8px; min-width:20px; text-align:right;">${cv(day.temperature_2m_min[i])}°</span>
+              <span class="flex-1 h-1 rounded-full bg-white/10 relative overflow-hidden">
                 <span class="absolute h-full rounded-full bg-gradient-to-r from-sky-400 via-amber-300 to-orange-500"
                       style="left:${l}%;width:${Math.max(w,5)}%"></span>
               </span>
-              <span class="txt-dim tabular-nums" style="font-size:9px; min-width:24px;">${cv(day.temperature_2m_max[i])}°</span>
+              <span class="txt-dim tabular-nums" style="font-size:8px; min-width:20px;">${cv(day.temperature_2m_max[i])}°</span>
             </div>
           </div>
 
           <!-- Détails dépliables -->
           <div class="detail"><div>
-            <div style="padding: 0 clamp(8px, 2vw, 20px) clamp(8px, 2vw, 16px);">
+            <div style="padding: 0 clamp(4px, 2vw, 20px) clamp(4px, 2vw, 16px);">
               <div class="detail-grid">
                 ${detailCell('wind','Vent max', wd+' km/h','text-sky-300')}
                 ${detailCell('umbrella','Précip.', mm+' mm','text-indigo-300')}
@@ -1174,10 +1290,10 @@
     }
 
     function detailCell(icon, label, val, color) {
-        return `<div class="rounded-xl bg-white/5 border border-white/10" style="padding:clamp(6px, 1.5vw, 12px);">
-        <p class="uppercase tracking-wider txt-dim flex items-center gap-1"
-           style="font-size:clamp(7px, 1vw, 10px);">${ico(icon,'w-2.5 h-2.5 sm:w-3 sm:h-3 '+color)}${label}</p>
-        <p class="font-bold tabular-nums mt-1" style="font-size:clamp(11px, 1.5vw, 14px);">${val}</p>
+        return `<div class="rounded-xl bg-white/5 border border-white/10">
+        <p class="uppercase tracking-wider txt-dim flex items-center gap-0.5"
+           style="font-size:clamp(6px, 1vw, 10px);">${ico(icon,'w-2 h-2 sm:w-3 sm:h-3 '+color)}${label}</p>
+        <p class="font-bold tabular-nums mt-0.5" style="font-size:clamp(10px, 1.5vw, 14px);">${val}</p>
       </div>`;
     }
 
@@ -1219,8 +1335,8 @@
         <path d="${area}" fill="url(#g1)"/>
         <path d="${path}" fill="none" stroke="url(#g2)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
         ${marks.map(i => `<circle cx="${X(i).toFixed(1)}" cy="${Y(temps[i]).toFixed(1)}" r="2.6" fill="currentColor"/>
-          <text x="${X(i).toFixed(1)}" y="${(Y(temps[i])-9).toFixed(1)}" text-anchor="middle" font-size="9" sm:font-size="10" font-weight="700" fill="currentColor">${cv(temps[i])}°</text>
-          <text x="${X(i).toFixed(1)}" y="${H-4}" text-anchor="middle" font-size="8" sm:font-size="9" fill="currentColor" opacity=".5">${String(hours[i]).padStart(2,'0')}h</text>`).join('')}`;
+          <text x="${X(i).toFixed(1)}" y="${(Y(temps[i])-9).toFixed(1)}" text-anchor="middle" font-weight="700" fill="currentColor">${cv(temps[i])}°</text>
+          <text x="${X(i).toFixed(1)}" y="${H-4}" text-anchor="middle" fill="currentColor" opacity=".5">${String(hours[i]).padStart(2,'0')}h</text>`).join('')}`;
     }
 
     /* ================= Démarrage ================= */
@@ -1229,7 +1345,10 @@
         const last = JSON.parse(localStorage.getItem('lastLoc') || 'null');
         if (last) { searchEl.value = last.name;
             toggleClear();
-            load(last.lat, last.lon, last.name, last.sub); } else load(48.8566, 2.3522, 'Paris', 'Île-de-France, France');
+            load(last.lat, last.lon, last.name, last.sub); } else {
+            // Lubumbashi par défaut
+            load(-11.6684, 27.4794, 'Lubumbashi', 'Haut-Katanga, République démocratique du Congo');
+        }
         refreshIcons();
     })();
 </script>
